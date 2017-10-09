@@ -1,0 +1,30 @@
+{
+    "ConnectionFields":  [
+                             {
+                                 "IsEncrypted":  false,
+                                 "IsOptional":  false,
+                                 "Name":  "ApplicationId",
+                                 "TypeName":  "System.String"
+                             },
+                              {
+                                 "IsEncrypted":  false,
+                                 "IsOptional":  false,
+                                 "Name":  "TenantId",
+                                 "TypeName":  "System.String"
+                             },
+                             {
+                                 "IsEncrypted":  false,
+                                 "IsOptional":  false,
+                                 "Name":  "SubscriptionId",
+                                 "TypeName":  "System.String"
+                             },
+                             {
+                                 "IsEncrypted":  true,
+                                 "IsOptional":  false,
+                                 "Name":  "ServicePrincipalKey",
+                                 "TypeName":  "System.String"
+                             }
+                         ],
+    "ConnectionTypeName":  "Key Based AzureServicePrincipal",
+    "IntegrationModuleName":  "AzureServicePrincipalAccount"
+}
