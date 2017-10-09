@@ -3,7 +3,7 @@
 #### Module version history
 | Author | Date | Version | Comment |
 |:--- | :---: | :---: | :---
-Tao Yang | 06/10/2017 | 1.0.0 | Initial release
+Tao Yang | 06/10/2017 | 1.0.1 | Initial release
 
 ## Introduction
 The **AzureServicePrincipalAccount** Powershell module is designed to simplify the Azure Sign-In process within the Azure Automation accounts using Azure AD Service Principals.
