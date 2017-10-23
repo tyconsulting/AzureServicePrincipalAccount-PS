@@ -4,7 +4,7 @@ Function Add-AzureRMServicePrincipalAccount
   [OutputType('PSAzureProfile')]
   [CmdletBinding()]
   Param(
-    [Parameter(ParameterSetName = 'BySPConnection',Mandatory = $true,HelpMessage = 'Please specify the Azure Automation AzureServicePrincipal Key Based connection object')]
+    [Parameter(ParameterSetName = 'BySPConnection',Mandatory = $true,HelpMessage = "Please specify the Azure Automation 'AzureServicePrincipal' or 'Key Based AzureServicePrincipal' connection object")]
     [Object]$AzureServicePrincipalConnection,
 
     [Parameter(ParameterSetName = 'BySPKey',Mandatory = $true,HelpMessage = 'Please specify the Azure AD Application ID')]
@@ -18,7 +18,7 @@ Function Add-AzureRMServicePrincipalAccount
         $false
       }
     })]
-    $ApplicationId,
+    [string]$ApplicationId,
 
     [Parameter(ParameterSetName = 'BySPKey',Mandatory = $false,HelpMessage = 'Please specify the Azure AD tenant ID')]
     [Parameter(ParameterSetName = 'BySPCert',Mandatory = $false,HelpMessage = 'Please specify the Azure AD tenant ID')]
@@ -52,12 +52,12 @@ Function Add-AzureRMServicePrincipalAccount
     [ValidateNotNullOrEmpty()]
     [string]$Environment = 'AzureCloud',
 
-    [Parameter(ParameterSetName = 'BySPKey',Mandatory = $false,HelpMessage = 'Please specify the Azure AD Application Service Principal Key')]
+    [Parameter(ParameterSetName = 'BySPKey',Mandatory = $true,HelpMessage = 'Please specify the Azure AD Application Service Principal Key')]
     [Alias('Password')]
     [ValidateNotNullOrEmpty()]
     [SecureString]$ServicePrincipalKey,
 
-    [Parameter(ParameterSetName = 'BySPCert',Mandatory = $false,HelpMessage = 'Please specify the Azure AD Application Service Principal certificate thumbprint')]
+    [Parameter(ParameterSetName = 'BySPCert',Mandatory = $true,HelpMessage = 'Please specify the Azure AD Application Service Principal certificate thumbprint')]
     [Alias('Thumbprint')]
     [ValidateNotNullOrEmpty()]
     [string]$CertThumbprint
@@ -126,4 +126,92 @@ Function Add-AzureRMServicePrincipalAccount
   }
 
   $Login
+}
+
+# .EXTERNALHELP AzureServicePrincipalAccount.psm1-Help.xml
+Function Get-AzureADToken
+{
+       
+  [CmdletBinding()]
+  [OutputType([string])]
+  PARAM (
+    [Parameter(ParameterSetName='BySPConnection', Mandatory=$true)]
+    [Alias('Con','Connection')]
+    [Object]$AzureServicePrincipalConnection,
+
+    [Parameter(ParameterSetName='BySPKey', Mandatory=$true)]
+    [ValidateScript({
+      try 
+      {
+        [System.Guid]::Parse($_) | Out-Null
+        $true
+      } 
+      catch 
+      {
+        $false
+      }
+    })]
+    [Alias('tID')]
+    [String]$TenantID,
+
+    [Parameter(ParameterSetName = 'BySPKey',Mandatory = $true,HelpMessage = 'Please specify the Azure AD credential')]
+    [Alias('cred')]
+    [ValidateNotNullOrEmpty()]
+    [PSCredential]$Credential,
+
+    [Parameter(ParameterSetName='BySPConnection', Mandatory = $false)]
+    [Parameter(ParameterSetName='BySPKey', Mandatory = $false)]
+    [String][ValidateNotNullOrEmpty()]$OAuthURI,
+
+    [Parameter(ParameterSetName='BySPConnection', Mandatory = $false)]
+    [Parameter(ParameterSetName='BySPKey', Mandatory = $false)]
+    [String][ValidateNotNullOrEmpty()]$ResourceURI ='https://management.azure.com/'
+    )
+  
+  #Extract fields from connection (hashtable)
+    If ($PSCmdlet.ParameterSetName -eq 'BySPConnection')
+    {
+      $bvalidConnectionObject = $false
+      if ($AzureServicePrincipalConnection.ContainsKey('Applicationid') -and $AzureServicePrincipalConnection.ContainsKey('TenantId') -and$AzureServicePrincipalConnection.ContainsKey('SubscriptionId'))
+      {
+        if ($AzureServicePrincipalConnection.ContainsKey('ServicePrincipalKey'))
+        {
+
+          $ClientId = $AzureServicePrincipalConnection.ApplicationId
+          $ClientSecret = $AzureServicePrincipalConnection.ServicePrincipalKey
+        
+          $TenantId = $AzureServicePrincipalConnection.TenantId
+          $bvalidConnectionObject = $true
+        }
+      }
+
+      if (!$bvalidConnectionObject)
+      {
+        Write-Error "The connection object is invalid. please ensure the connection object type must be 'Key Based AzureServicePrincipal'."
+        Exit -1
+      }
+    }
+
+  If ($PSCmdlet.ParameterSetName -eq 'BySPKey')
+  {
+    $ClientId = $Credential.UserName
+    $ClientSecret = $Credential.GetNetworkCredential().Password
+  }
+
+  #URI to get oAuth Access Token
+  If (!$PSBoundParameters.ContainsKey('oAuthURI'))
+  {
+    $oAuthURI = "https://login.microsoftonline.com/$TenantId/oauth2/token"
+  }
+  
+  #oAuth token request
+
+  $body = 'grant_type=client_credentials'
+  $body += '&client_id=' + $ClientId
+  $body += '&client_secret=' + [Uri]::EscapeDataString($ClientSecret)
+  $body += '&resource=' + [Uri]::EscapeDataString($ResourceURI)
+
+  $response = Invoke-RestMethod -Method POST -Uri $oAuthURI -Headers @{} -Body $body
+
+  $response.access_token
 }
