@@ -139,7 +139,7 @@ Function Get-AzureADToken
     [Alias('Con','Connection')]
     [Object]$AzureServicePrincipalConnection,
 
-    [Parameter(ParameterSetName='BySPKey', Mandatory=$true)]
+    [Parameter(ParameterSetName='ByCred', Mandatory=$true)]
     [ValidateScript({
       try 
       {
@@ -154,17 +154,102 @@ Function Get-AzureADToken
     [Alias('tID')]
     [String]$TenantID,
 
-    [Parameter(ParameterSetName = 'BySPKey',Mandatory = $true,HelpMessage = 'Please specify the Azure AD credential')]
+    [Parameter(ParameterSetName = 'ByCred',Mandatory = $true,HelpMessage = 'Please specify the Azure AD credential')]
     [Alias('cred')]
     [ValidateNotNullOrEmpty()]
     [PSCredential]$Credential,
 
     [Parameter(ParameterSetName='BySPConnection', Mandatory = $false)]
-    [Parameter(ParameterSetName='BySPKey', Mandatory = $false)]
+    [Parameter(ParameterSetName='ByCred', Mandatory = $false)]
     [String][ValidateNotNullOrEmpty()]$OAuthURI,
 
     [Parameter(ParameterSetName='BySPConnection', Mandatory = $false)]
-    [Parameter(ParameterSetName='BySPKey', Mandatory = $false)]
+    [Parameter(ParameterSetName='ByCred', Mandatory = $false)]
+    [String][ValidateNotNullOrEmpty()]$ResourceURI ='https://management.azure.com/'
+    )
+  
+     #URI to get oAuth Access Token
+    If (!$PSBoundParameters.ContainsKey('oAuthURI'))
+    {
+      $oAuthURI = "https://login.microsoftonline.com/$TenantId/oauth2/token"
+    }
+
+    #Request token
+    If ($PSCmdlet.ParameterSetName -eq 'BySPConnection')
+    {
+      $bvalidConnectionObject = $false
+      if ($AzureServicePrincipalConnection.ContainsKey('Applicationid') -and $AzureServicePrincipalConnection.ContainsKey('TenantId') -and$AzureServicePrincipalConnection.ContainsKey('SubscriptionId'))
+      {
+        if ($AzureServicePrincipalConnection.ContainsKey('ServicePrincipalKey'))
+        {
+
+          $token = Get-AzureADTokenForServicePrincipal -AzureServicePrincipalConnection $AzureServicePrincipalConnection
+        }
+      } else {
+        Write-Error "The connection object is invalid. please ensure the connection object type must be 'Key Based AzureServicePrincipal'."
+        Exit -1
+      }
+
+    } elseif ($PSCmdlet.ParameterSetName -eq 'ByCred')
+    {
+      $ClientId = $Credential.UserName
+      #Check if an Azure Application service principal is used
+      try 
+      {
+        [System.Guid]::Parse($ClientId) | Out-Null
+        $bIsSP = $true
+      } 
+      catch 
+      {
+        $bIsSP = $false
+      }
+
+      if ($bIsSP)
+      {
+        $Token = Get-AzureADTokenForServicePrincipal -TenantID $TenantID -Credential $Credential -OAuthURI $OAuthURI -ResourceURI $ResourceURI
+      } else {
+        $Token = Get-AzureADTokenForUser -TenantID $TenantID -Credential $Credential -OAuthURI $OAuthURI -ResourceURI $ResourceURI
+      }
+    }
+
+    $token
+}
+
+Function Get-AzureADTokenForServicePrincipal
+{
+  [CmdletBinding()]
+  [OutputType([string])]
+  PARAM (
+    [Parameter(ParameterSetName='BySPConnection', Mandatory=$true)]
+    [Alias('Con','Connection')]
+    [Object]$AzureServicePrincipalConnection,
+
+    [Parameter(ParameterSetName='ByCred', Mandatory=$true)]
+    [ValidateScript({
+      try 
+      {
+        [System.Guid]::Parse($_) | Out-Null
+        $true
+      } 
+      catch 
+      {
+        $false
+      }
+    })]
+    [Alias('tID')]
+    [String]$TenantID,
+
+    [Parameter(ParameterSetName = 'ByCred',Mandatory = $true,HelpMessage = 'Please specify the Azure AD credential')]
+    [Alias('cred')]
+    [ValidateNotNullOrEmpty()]
+    [PSCredential]$Credential,
+
+    [Parameter(ParameterSetName='BySPConnection', Mandatory = $false)]
+    [Parameter(ParameterSetName='ByCred', Mandatory = $false)]
+    [String][ValidateNotNullOrEmpty()]$OAuthURI,
+
+    [Parameter(ParameterSetName='BySPConnection', Mandatory = $false)]
+    [Parameter(ParameterSetName='ByCred', Mandatory = $false)]
     [String][ValidateNotNullOrEmpty()]$ResourceURI ='https://management.azure.com/'
     )
   
@@ -192,7 +277,7 @@ Function Get-AzureADToken
       }
     }
 
-  If ($PSCmdlet.ParameterSetName -eq 'BySPKey')
+  If ($PSCmdlet.ParameterSetName -eq 'ByCred')
   {
     $ClientId = $Credential.UserName
     $ClientSecret = $Credential.GetNetworkCredential().Password
@@ -213,5 +298,65 @@ Function Get-AzureADToken
 
   $response = Invoke-RestMethod -Method POST -Uri $oAuthURI -Headers @{} -Body $body
 
-  $response.access_token
+  $Token = "Bearer $($response.access_token)"
+  $Token
+}
+Function Get-AzureADTokenForUser
+{
+  [CmdletBinding()]
+  [OutputType([string])]
+  PARAM (
+    [Parameter(Mandatory=$true)]
+    [ValidateScript({
+          try 
+          {
+            [System.Guid]::Parse($_) | Out-Null
+            $true
+          } 
+          catch 
+          {
+            $false
+          }
+    })]
+    [Alias('tID')]
+    [String]$TenantID,
+
+    [Parameter(Mandatory=$true)][Alias('cred')]
+    [pscredential]
+    [System.Management.Automation.CredentialAttribute()]
+    $Credential,
+
+    [Parameter(Mandatory = $true)]
+    [String][ValidateNotNullOrEmpty()]$OAuthURI,
+
+    [Parameter(Mandatory = $true)]
+    [String][ValidateNotNullOrEmpty()]$ResourceURI
+  )
+  Try
+  {
+    $Username       = $Credential.Username
+    $Password       = $Credential.Password
+
+    # Set well-known client ID for Azure PowerShell
+    $clientId = '1950a258-227b-4e31-a9cf-717495945fc2'
+
+    # Set Resource URI to Azure Service Management API
+    $resourceAppIdURI = 'https://management.azure.com/'
+
+    # Set Authority to Azure AD Tenant
+    $authority = 'https://login.microsoftonline.com/common/' + $TenantID
+    Write-Verbose "Authority: $OAuthURI"
+
+    $AADcredential = [Microsoft.IdentityModel.Clients.ActiveDirectory.UserCredential]::new($UserName, $Password)
+    $authContext = [Microsoft.IdentityModel.Clients.ActiveDirectory.AuthenticationContext]::new($OAuthURI)
+    $authResult = $authContext.AcquireTokenAsync($ResourceURI,$clientId,$AADcredential)
+    $Token = $authResult.Result.CreateAuthorizationHeader()
+  }
+  Catch
+  {
+    Throw $_
+    $ErrorMessage = 'Failed to aquire Azure AD token.'
+    Write-Error -Message 'Failed to aquire Azure AD token'
+  }
+$Token
 }

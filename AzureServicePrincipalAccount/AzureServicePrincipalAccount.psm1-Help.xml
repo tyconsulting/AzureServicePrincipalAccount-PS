@@ -387,8 +387,8 @@ Add-AzureRMServicePrincipalAccount -ApplicationId $ApplicationId -TenantId $Tena
 					<dev:defaultValue>https://management.azure.com/</dev:defaultValue>
 				</command:parameter>
 			</command:syntaxItem>
-			<command:syntaxItem parametersetname="BySPKey">
-				<!--NAME: BySPKey-->
+			<command:syntaxItem parametersetname="ByCred">
+				<!--NAME: ByCred-->
 				<maml:name>Get-AzureADToken</maml:name>
 				<command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="named" aliases="Tenant" xmlns:command="http://schemas.microsoft.com/maml/dev/command/2004/10">
 					<maml:name xmlns:maml="http://schemas.microsoft.com/maml/2004/10">TenantId</maml:name>
@@ -531,7 +531,7 @@ Get-AzureADToken -AzureServicePrincipalConnection $KeyBasedConnection</dev:code>
 				</maml:introduction>
 				<dev:code xmlns:dev="http://schemas.microsoft.com/maml/dev/2004/10">$ServicePrincipalKey = ConvertTo-SecureString -String 'password1234'-AsPlainText -Force
 $AzureADCred = New-Object System.Mangement.Automation.PSCredential($ApplicationId, $ServicePrincipalKey)
-Get-AzureADToken -ApplicationId $ApplicationId -TenantId $TenantId -SubscriptionId $SubscriptionId -ServicePrincipalKey $ServicePrincipalKey
+Get-AzureADToken -Credential $AzureADCred -SubscriptionId $SubscriptionId -ServicePrincipalKey $ServicePrincipalKey
 </dev:code>
 				<dev:remarks xmlns:dev="http://schemas.microsoft.com/maml/dev/2004/10">
 					<maml:para>Generate an oAuth token to access ARM rest API (https://management.azure.com) using a key-based service principal by specifying individual parameters</maml:para>
@@ -552,6 +552,20 @@ $KeyBasedConnection = Get-AutomationConnection 'KeyBasedConnectionName'
 Get-AzureADToken -AzureServicePrincipalConnection $KeyBasedConnection -OAuthURI $KeyVaultOAuth2Uri -ResourceURI 'https://vault.azure.net'</dev:code>
 				<dev:remarks xmlns:dev="http://schemas.microsoft.com/maml/dev/2004/10">
 					<maml:para>Generate an oAuth token to access Azure Key vault REST API (https://vault.azure.net) using a key-based service principal connection object</maml:para>
+				</dev:remarks>
+			</command:example>
+			<command:example xmlns:command="http://schemas.microsoft.com/maml/dev/command/2004/10">
+				<maml:title xmlns:maml="http://schemas.microsoft.com/maml/2004/10">--------EXAMPLE 4--------</maml:title>
+				<maml:introduction xmlns:maml="http://schemas.microsoft.com/maml/2004/10">
+					<maml:para>C:\PS&gt;</maml:para>
+				</maml:introduction>
+				<dev:code xmlns:dev="http://schemas.microsoft.com/maml/dev/2004/10">$username = 'you@contoso.onmicrosoft.com'
+$password= ConvertTo-SecureString -String 'password1234'-AsPlainText -Force
+$AzureADCred = New-Object System.Mangement.Automation.PSCredential($username, $password)
+Get-AzureADToken -Credential $AzureADCred -SubscriptionId $SubscriptionId -ServicePrincipalKey $ServicePrincipalKey
+</dev:code>
+				<dev:remarks xmlns:dev="http://schemas.microsoft.com/maml/dev/2004/10">
+					<maml:para>Generate an oAuth token to access ARM rest API (https://management.azure.com) using a Azure AD User Principal</maml:para>
 				</dev:remarks>
 			</command:example>
 		</command:examples>
