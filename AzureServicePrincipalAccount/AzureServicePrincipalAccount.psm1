@@ -169,6 +169,10 @@ Function Get-AzureADToken
     )
   
      #URI to get oAuth Access Token
+    If ($PSCmdlet.ParameterSetName -eq 'BySPConnection')
+    {
+       $TenantId = $AzureServicePrincipalConnection.TenantId
+    }
     If (!$PSBoundParameters.ContainsKey('oAuthURI'))
     {
       $oAuthURI = "https://login.microsoftonline.com/$TenantId/oauth2/token"
@@ -183,7 +187,7 @@ Function Get-AzureADToken
         if ($AzureServicePrincipalConnection.ContainsKey('ServicePrincipalKey'))
         {
 
-          $token = Get-AzureADTokenForServicePrincipal -AzureServicePrincipalConnection $AzureServicePrincipalConnection
+          $token = Get-AzureADTokenForServicePrincipal -AzureServicePrincipalConnection $AzureServicePrincipalConnection -OAuthURI $OAuthURI -ResourceURI $ResourceURI
         }
       } else {
         Write-Error "The connection object is invalid. please ensure the connection object type must be 'Key Based AzureServicePrincipal'."
