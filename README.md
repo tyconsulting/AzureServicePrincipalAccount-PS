@@ -5,6 +5,8 @@
 |:--- | :---: | :---: | :---
 Tao Yang | 06/10/2017 | 1.0.1 | Initial release
 Tao Yang | 23/10/2017 | 1.1.0 | Added Get-AzureADToken function
+Tao Yang | 31/10/2017 | 1.2.0 | Get-AzureADToken added support for user principals
+Tao Yang | 20/11/2017 | 1.3.0 | Get-AzureADToken added support for interactive user logins (ideally for MFA-Enabled users)
 ## Introduction
 The **AzureServicePrincipalAccount** Powershell module is designed to simplify the Azure Sign-In process within the Azure Automation accounts using Azure AD Service Principals.
 

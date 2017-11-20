@@ -564,7 +564,7 @@ $Token</dev:code>
 				</maml:introduction>
 				<dev:code xmlns:dev="http://schemas.microsoft.com/maml/dev/2004/10">$ServicePrincipalKey = ConvertTo-SecureString -String 'password1234'-AsPlainText -Force
 $AzureADCred = New-Object System.Mangement.Automation.PSCredential($ApplicationId, $ServicePrincipalKey)
-$Token = Get-AzureADToken -Credential $AzureADCred -TenantId $TenantId
+$Token = Get-AzureADToken -Credential $AzureADCred -TenantId $TenantId -ServicePrincipalKey $ServicePrincipalKey
 $Token</dev:code>
 				<dev:remarks xmlns:dev="http://schemas.microsoft.com/maml/dev/2004/10">
 					<maml:para>Generate an oAuth token to access ARM rest API (https://management.azure.com) using a key-based service principal by specifying individual parameters</maml:para>
@@ -608,7 +608,7 @@ $Token
 				<maml:introduction xmlns:maml="http://schemas.microsoft.com/maml/2004/10">
 					<maml:para>C:\PS&gt;</maml:para>
 				</maml:introduction>
-				<dev:code xmlns:dev="http://schemas.microsoft.com/maml/dev/2004/10">$Token = Get-AzureADToken -TenantId $TenantId 
+				<dev:code xmlns:dev="http://schemas.microsoft.com/maml/dev/2004/10">$Token = Get-AzureADToken -Credential $AzureADCred -TenantId $TenantId 
 $Token</dev:code>
 				<dev:remarks xmlns:dev="http://schemas.microsoft.com/maml/dev/2004/10">
 					<maml:para>Generate an oAuth token to access ARM rest API (https://management.azure.com) using a Azure AD User Principal (by prompting entering user name and password). This method supports user accounts with MFA enabled.</maml:para>
@@ -619,7 +619,7 @@ $Token</dev:code>
 				<maml:introduction xmlns:maml="http://schemas.microsoft.com/maml/2004/10">
 					<maml:para>C:\PS&gt;</maml:para>
 				</maml:introduction>
-				<dev:code xmlns:dev="http://schemas.microsoft.com/maml/dev/2004/10">$Token = Get-AzureADToken -TenantId $TenantId -ResourceURI 'https://graph.windows.net'
+				<dev:code xmlns:dev="http://schemas.microsoft.com/maml/dev/2004/10">$Token = Get-AzureADToken -Credential $AzureADCred -TenantId $TenantId -ResourceURI 'https://graph.windows.net'
 $Token</dev:code>
 				<dev:remarks xmlns:dev="http://schemas.microsoft.com/maml/dev/2004/10">
 					<maml:para>Generate an oAuth token to access Microsoft Graph API (https://graph.windows.net) using a Azure AD User Principal (by prompting entering user name and password). This method supports user accounts with MFA enabled.</maml:para>

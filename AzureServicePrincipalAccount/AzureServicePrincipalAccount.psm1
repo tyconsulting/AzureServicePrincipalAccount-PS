@@ -140,6 +140,7 @@ Function Get-AzureADToken
     [Object]$AzureServicePrincipalConnection,
 
     [Parameter(ParameterSetName='ByCred', Mandatory=$true)]
+    [Parameter(ParameterSetName='UserInteractive', Mandatory = $true)]
     [ValidateScript({
       try 
       {
@@ -161,10 +162,12 @@ Function Get-AzureADToken
 
     [Parameter(ParameterSetName='BySPConnection', Mandatory = $false)]
     [Parameter(ParameterSetName='ByCred', Mandatory = $false)]
+    [Parameter(ParameterSetName='UserInteractive', Mandatory = $false)]
     [String][ValidateNotNullOrEmpty()]$OAuthURI,
 
     [Parameter(ParameterSetName='BySPConnection', Mandatory = $false)]
     [Parameter(ParameterSetName='ByCred', Mandatory = $false)]
+    [Parameter(ParameterSetName='UserInteractive', Mandatory = $false)]
     [String][ValidateNotNullOrEmpty()]$ResourceURI ='https://management.azure.com/'
     )
   
@@ -214,6 +217,9 @@ Function Get-AzureADToken
       } else {
         $Token = Get-AzureADTokenForUser -TenantID $TenantID -Credential $Credential -OAuthURI $OAuthURI -ResourceURI $ResourceURI
       }
+    } else {
+      #Getting an token for user principal by interactive logon - support for MFA scenario
+      $Token = Get-AzureADTokenForUserInteractive -TenantID $TenantID -OAuthURI $OAuthURI -ResourceURI $ResourceURI
     }
 
     $token
@@ -344,9 +350,6 @@ Function Get-AzureADTokenForUser
     # Set well-known client ID for Azure PowerShell
     $clientId = '1950a258-227b-4e31-a9cf-717495945fc2'
 
-    # Set Resource URI to Azure Service Management API
-    $resourceAppIdURI = 'https://management.azure.com/'
-
     # Set Authority to Azure AD Tenant
     $authority = 'https://login.microsoftonline.com/common/' + $TenantID
     Write-Verbose "Authority: $OAuthURI"
@@ -362,5 +365,56 @@ Function Get-AzureADTokenForUser
     $ErrorMessage = 'Failed to aquire Azure AD token.'
     Write-Error -Message 'Failed to aquire Azure AD token'
   }
-$Token
+  $Token
+}
+
+Function Get-AzureADTokenForUserInteractive
+{
+[CmdletBinding()]
+  [OutputType([string])]
+  PARAM (
+    [Parameter(Mandatory=$true)]
+    [ValidateScript({
+          try 
+          {
+            [System.Guid]::Parse($_) | Out-Null
+            $true
+          } 
+          catch 
+          {
+            $false
+          }
+    })]
+    [Alias('tID')]
+    [String]$TenantID,
+
+    [Parameter(Mandatory = $true)]
+    [String][ValidateNotNullOrEmpty()]$OAuthURI,
+
+    [Parameter(Mandatory = $true)]
+    [String][ValidateNotNullOrEmpty()]$ResourceURI
+  )
+    Try
+  {
+
+    # Set well-known client ID for Azure PowerShell
+    $clientId = '1950a258-227b-4e31-a9cf-717495945fc2'
+    # Set redirect URI for Azure PowerShell
+    $redirectUri = "urn:ietf:wg:oauth:2.0:oob"
+
+    # Set Authority to Azure AD Tenant
+    Write-Verbose "Authority: $OAuthURI"
+
+    $authContext = [Microsoft.IdentityModel.Clients.ActiveDirectory.AuthenticationContext]::new($oAuthURI)
+    $authResult = $authContext.AcquireToken($ResourceURI, $clientId, $redirectUri, "always")
+    $token = $authResult.CreateAuthorizationHeader()
+  }
+  Catch
+  {
+    Throw $_
+    $ErrorMessage = 'Failed to aquire Azure AD token.'
+    Write-Error -Message 'Failed to aquire Azure AD token'
+  }
+  
+  $token
 }
