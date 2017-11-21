@@ -160,6 +160,10 @@ Function Get-AzureADToken
     [ValidateNotNullOrEmpty()]
     [PSCredential]$Credential,
 
+    [Parameter(ParameterSetName = 'UserInteractive',Mandatory = $false)]
+    [ValidateNotNullOrEmpty()]
+    [string]$UserName,
+
     [Parameter(ParameterSetName='BySPConnection', Mandatory = $false)]
     [Parameter(ParameterSetName='ByCred', Mandatory = $false)]
     [Parameter(ParameterSetName='UserInteractive', Mandatory = $false)]
@@ -219,7 +223,16 @@ Function Get-AzureADToken
       }
     } else {
       #Getting an token for user principal by interactive logon - support for MFA scenario
-      $Token = Get-AzureADTokenForUserInteractive -TenantID $TenantID -OAuthURI $OAuthURI -ResourceURI $ResourceURI
+      $InteractiveParam = @{
+       'TenantID' = $TenantID
+       'OAuthURI' = $OAuthURI
+       'ResourceURI' = $ResourceURI
+      }
+      if ($PSBoundParameters.ContainsKey('UserName'))
+      {
+        $InteractiveParam.Add('UserName', $UserName)
+      }
+      $Token = Get-AzureADTokenForUserInteractive @InteractiveParam
     }
 
     $token
@@ -388,6 +401,9 @@ Function Get-AzureADTokenForUserInteractive
     [Alias('tID')]
     [String]$TenantID,
 
+    [Parameter(Mandatory = $false)]
+    [String][ValidateNotNullOrEmpty()]$UserName,
+
     [Parameter(Mandatory = $true)]
     [String][ValidateNotNullOrEmpty()]$OAuthURI,
 
@@ -406,7 +422,14 @@ Function Get-AzureADTokenForUserInteractive
     Write-Verbose "Authority: $OAuthURI"
 
     $authContext = [Microsoft.IdentityModel.Clients.ActiveDirectory.AuthenticationContext]::new($oAuthURI)
-    $authResult = $authContext.AcquireToken($ResourceURI, $clientId, $redirectUri, "always")
+    if ($PSBoundParameters.ContainsKey('UserName'))
+    {
+      $userIdentifier =  [Microsoft.IdentityModel.Clients.ActiveDirectory.UserIdentifier]::new($UserName, [Microsoft.IdentityModel.Clients.ActiveDirectory.UserIdentifierType]::RequiredDisplayableId)
+      $authResult = $authContext.AcquireToken($ResourceURI, $clientId, $redirectUri, "always", $userIdentifier)
+    } else {
+      $authResult = $authContext.AcquireToken($ResourceURI, $clientId, $redirectUri, "always")
+    }
+    
     $token = $authResult.CreateAuthorizationHeader()
   }
   Catch

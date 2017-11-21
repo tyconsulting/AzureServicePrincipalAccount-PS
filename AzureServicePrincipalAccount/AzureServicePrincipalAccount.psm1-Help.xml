@@ -375,8 +375,8 @@ Add-AzureRMServicePrincipalAccount -ApplicationId $ApplicationId -TenantId $Tena
 					<maml:description>
 						<maml:para>The URI for requesting oAuth token. if not specified, the default value is "https://login.microsoftonline.com/$TenantId/oauth2/token"</maml:para>
 					</maml:description>
-					<command:parameterValue required="false" variableLength="false" />
-					<dev:defaultValue />
+					<command:parameterValue required="false" variableLength="false">String</command:parameterValue>
+					<dev:defaultValue>https://management.azure.com/</dev:defaultValue>
 				</command:parameter>
 				<command:parameter required="false" globbing="false" pipelineInput="false" variableLength="false" position="named">
 					<maml:name>ResourceURI</maml:name>
@@ -390,7 +390,7 @@ Add-AzureRMServicePrincipalAccount -ApplicationId $ApplicationId -TenantId $Tena
 			<command:syntaxItem parametersetname="ByCred">
 				<!--NAME: ByCred-->
 				<maml:name>Get-AzureADToken</maml:name>
-				<command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="named" aliases="Tenant" xmlns:command="http://schemas.microsoft.com/maml/dev/command/2004/10">
+				<command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="named" aliases="tID" xmlns:command="http://schemas.microsoft.com/maml/dev/command/2004/10">
 					<maml:name xmlns:maml="http://schemas.microsoft.com/maml/2004/10">TenantId</maml:name>
 					<maml:description xmlns:maml="http://schemas.microsoft.com/maml/2004/10">
 						<maml:para>Azure AD Tenant ID</maml:para>
@@ -407,8 +407,8 @@ Add-AzureRMServicePrincipalAccount -ApplicationId $ApplicationId -TenantId $Tena
 					<maml:description>
 						<maml:para>The URI for requesting oAuth token. if not specified, the default value is "https://login.microsoftonline.com/$TenantId/oauth2/token"</maml:para>
 					</maml:description>
-					<command:parameterValue required="false" variableLength="false" />
-					<dev:defaultValue />
+					<command:parameterValue required="false" variableLength="false">String</command:parameterValue>
+					<dev:defaultValue>https://management.azure.com/</dev:defaultValue>
 				</command:parameter>
 				<command:parameter required="false" globbing="false" pipelineInput="false" variableLength="false" position="named">
 					<maml:name>ResourceURI</maml:name>
@@ -434,7 +434,7 @@ Add-AzureRMServicePrincipalAccount -ApplicationId $ApplicationId -TenantId $Tena
 			<command:syntaxItem parametersetname="UserInteractive">
 				<!--NAME: UserInteractive-->
 				<maml:name>Get-AzureADToken</maml:name>
-				<command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="named" aliases="Tenant" xmlns:command="http://schemas.microsoft.com/maml/dev/command/2004/10">
+				<command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="named" aliases="tID" xmlns:command="http://schemas.microsoft.com/maml/dev/command/2004/10">
 					<maml:name xmlns:maml="http://schemas.microsoft.com/maml/2004/10">TenantId</maml:name>
 					<maml:description xmlns:maml="http://schemas.microsoft.com/maml/2004/10">
 						<maml:para>Azure AD Tenant ID</maml:para>
@@ -451,8 +451,8 @@ Add-AzureRMServicePrincipalAccount -ApplicationId $ApplicationId -TenantId $Tena
 					<maml:description>
 						<maml:para>The URI for requesting oAuth token. if not specified, the default value is "https://login.microsoftonline.com/$TenantId/oauth2/token"</maml:para>
 					</maml:description>
-					<command:parameterValue required="false" variableLength="false" />
-					<dev:defaultValue />
+					<command:parameterValue required="false" variableLength="false">String</command:parameterValue>
+					<dev:defaultValue>https://management.azure.com/</dev:defaultValue>
 				</command:parameter>
 				<command:parameter required="false" globbing="false" pipelineInput="false" variableLength="false" position="named">
 					<maml:name>ResourceURI</maml:name>
@@ -461,6 +461,14 @@ Add-AzureRMServicePrincipalAccount -ApplicationId $ApplicationId -TenantId $Tena
 					</maml:description>
 					<command:parameterValue required="false" variableLength="false" />
 					<dev:defaultValue>https://management.azure.com/</dev:defaultValue>
+				</command:parameter>
+				<command:parameter required="false" globbing="false" pipelineInput="false" variableLength="false" position="named">
+					<maml:name>UserName</maml:name>
+					<maml:description>
+						<maml:para>the Azure AD user name that you wish to generate the token for. User will be prompted to enter the password and pass MFA (if MFA is enabled) when the user name is specified.</maml:para>
+					</maml:description>
+					<command:parameterValue required="false" variableLength="false">String</command:parameterValue>
+					<dev:defaultValue />
 				</command:parameter>
 			</command:syntaxItem>
 		</command:syntax>
@@ -478,7 +486,7 @@ Add-AzureRMServicePrincipalAccount -ApplicationId $ApplicationId -TenantId $Tena
 				</dev:type>
 				<dev:defaultValue xmlns:dev="http://schemas.microsoft.com/maml/dev/2004/10"></dev:defaultValue>
 			</command:parameter>
-			<command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="named" aliases="Tenant" xmlns:command="http://schemas.microsoft.com/maml/dev/command/2004/10">
+			<command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="named" aliases="tID" xmlns:command="http://schemas.microsoft.com/maml/dev/command/2004/10">
 				<maml:name xmlns:maml="http://schemas.microsoft.com/maml/2004/10">TenantId</maml:name>
 				<maml:description xmlns:maml="http://schemas.microsoft.com/maml/2004/10">
 					<maml:para>Azure AD Tenant ID</maml:para>
@@ -495,8 +503,8 @@ Add-AzureRMServicePrincipalAccount -ApplicationId $ApplicationId -TenantId $Tena
 				<maml:description>
 					<maml:para>The URI for requesting oAuth token. if not specified, the default value is "https://login.microsoftonline.com/$TenantId/oauth2/token"</maml:para>
 				</maml:description>
-				<command:parameterValue required="false" variableLength="false" />
-				<dev:defaultValue />
+				<command:parameterValue required="false" variableLength="false">String</command:parameterValue>
+				<dev:defaultValue>https://login.microsoftonline.com/$TenantId/oauth2/token</dev:defaultValue>
 			</command:parameter>
 			<command:parameter required="false" globbing="false" pipelineInput="false" variableLength="false" position="named">
 				<maml:name>ResourceURI</maml:name>
@@ -517,6 +525,14 @@ Add-AzureRMServicePrincipalAccount -ApplicationId $ApplicationId -TenantId $Tena
 					<maml:uri xmlns:maml="http://schemas.microsoft.com/maml/2004/10" />
 				</dev:type>
 				<dev:defaultValue xmlns:dev="http://schemas.microsoft.com/maml/dev/2004/10"></dev:defaultValue>
+			</command:parameter>
+			<command:parameter required="false" globbing="false" pipelineInput="false" variableLength="false" position="named">
+				<maml:name>UserName</maml:name>
+				<maml:description>
+					<maml:para>the Azure AD user name that you wish to generate the token for. User will be prompted to enter the password and pass MFA (if MFA is enabled) when the user name is specified.</maml:para>
+				</maml:description>
+				<command:parameterValue required="false" variableLength="false">String</command:parameterValue>
+				<dev:defaultValue />
 			</command:parameter>
 		</command:parameters>
 		<command:inputTypes>
@@ -623,6 +639,17 @@ $Token</dev:code>
 $Token</dev:code>
 				<dev:remarks xmlns:dev="http://schemas.microsoft.com/maml/dev/2004/10">
 					<maml:para>Generate an oAuth token to access Microsoft Graph API (https://graph.windows.net) using a Azure AD User Principal (by prompting entering user name and password). This method supports user accounts with MFA enabled.</maml:para>
+				</dev:remarks>
+			</command:example>
+			<command:example>
+				<maml:title>--------EXAMPLE 7--------</maml:title>
+				<maml:introduction>
+					<maml:para />
+				</maml:introduction>
+				<dev:code>$Token = Get-AzureADToken -TenantId $TenantId -UserName 'you@company.onmicrosoft.com'
+$Token</dev:code>
+				<dev:remarks>
+					<maml:para>Generate an oAuth token to access ARM rest API (https://management.azure.com) for an Azure AD user account (by prompting entering the password). This method supports user accounts with MFA enabled. The user name is restricted to the value that's been passed in. If the user changes user name in the logon prompt windows, the function will fail.</maml:para>
 				</dev:remarks>
 			</command:example>
 		</command:examples>
