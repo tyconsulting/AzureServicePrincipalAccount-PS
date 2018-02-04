@@ -383,7 +383,7 @@ Add-AzureRMServicePrincipalAccount -ApplicationId $ApplicationId -TenantId $Tena
 					<maml:description>
 						<maml:para>The Resource URI for where the oAuth token will be consumed.</maml:para>
 					</maml:description>
-					<command:parameterValue required="false" variableLength="false" />
+					<command:parameterValue required="false" variableLength="false">String</command:parameterValue>
 					<dev:defaultValue>https://management.azure.com/</dev:defaultValue>
 				</command:parameter>
 			</command:syntaxItem>
@@ -415,7 +415,7 @@ Add-AzureRMServicePrincipalAccount -ApplicationId $ApplicationId -TenantId $Tena
 					<maml:description>
 						<maml:para>The Resource URI for where the oAuth token will be consumed.</maml:para>
 					</maml:description>
-					<command:parameterValue required="false" variableLength="false" />
+					<command:parameterValue required="false" variableLength="false">String</command:parameterValue>
 					<dev:defaultValue>https://management.azure.com/</dev:defaultValue>
 				</command:parameter>
 				<command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="named" aliases="Cred" xmlns:command="http://schemas.microsoft.com/maml/dev/command/2004/10">
@@ -459,7 +459,7 @@ Add-AzureRMServicePrincipalAccount -ApplicationId $ApplicationId -TenantId $Tena
 					<maml:description>
 						<maml:para>The Resource URI for where the oAuth token will be consumed.</maml:para>
 					</maml:description>
-					<command:parameterValue required="false" variableLength="false" />
+					<command:parameterValue required="false" variableLength="false">String</command:parameterValue>
 					<dev:defaultValue>https://management.azure.com/</dev:defaultValue>
 				</command:parameter>
 				<command:parameter required="false" globbing="false" pipelineInput="false" variableLength="false" position="named">
@@ -469,6 +469,118 @@ Add-AzureRMServicePrincipalAccount -ApplicationId $ApplicationId -TenantId $Tena
 					</maml:description>
 					<command:parameterValue required="false" variableLength="false">String</command:parameterValue>
 					<dev:defaultValue />
+				</command:parameter>
+			</command:syntaxItem>
+			<command:syntaxItem parametersetname="ByCertFile">
+				<!--NAME: ByCertFile-->
+				<maml:name>Get-AzureADToken</maml:name>
+				<command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="named" aliases="tID" xmlns:command="http://schemas.microsoft.com/maml/dev/command/2004/10">
+					<maml:name xmlns:maml="http://schemas.microsoft.com/maml/2004/10">TenantId</maml:name>
+					<maml:description xmlns:maml="http://schemas.microsoft.com/maml/2004/10">
+						<maml:para>Azure AD Tenant ID</maml:para>
+					</maml:description>
+					<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+					<dev:type xmlns:dev="http://schemas.microsoft.com/maml/dev/2004/10">
+						<maml:name xmlns:maml="http://schemas.microsoft.com/maml/2004/10">String</maml:name>
+						<maml:uri xmlns:maml="http://schemas.microsoft.com/maml/2004/10" />
+					</dev:type>
+					<dev:defaultValue xmlns:dev="http://schemas.microsoft.com/maml/dev/2004/10"></dev:defaultValue>
+				</command:parameter>
+				<command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="named" aliases="" xmlns:command="http://schemas.microsoft.com/maml/dev/command/2004/10">
+					<maml:name xmlns:maml="http://schemas.microsoft.com/maml/2004/10">ApplicationId</maml:name>
+					<maml:description xmlns:maml="http://schemas.microsoft.com/maml/2004/10">
+						<maml:para>Azure AD Application ID</maml:para>
+					</maml:description>
+					<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+					<dev:type xmlns:dev="http://schemas.microsoft.com/maml/dev/2004/10">
+						<maml:name xmlns:maml="http://schemas.microsoft.com/maml/2004/10">String</maml:name>
+						<maml:uri xmlns:maml="http://schemas.microsoft.com/maml/2004/10" />
+					</dev:type>
+					<dev:defaultValue xmlns:dev="http://schemas.microsoft.com/maml/dev/2004/10"></dev:defaultValue>
+				</command:parameter>
+				<command:parameter required="true" globbing="false" pipelineInput="false" variableLength="false" position="named">
+					<maml:name>CertFilePath</maml:name>
+					<maml:description>
+						<maml:para>Path to the PFX Certificate file that is used by Azure AD application certificate-based Service Principal.</maml:para>
+					</maml:description>
+					<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+					<dev:defaultValue />
+				</command:parameter>
+				<command:parameter required="true" globbing="false" pipelineInput="false" variableLength="false" position="named">
+					<maml:name>CertFilePassword</maml:name>
+					<maml:description>
+						<maml:para>Password of the PFX Certificate file that is used by Azure AD application certificate-based Service Principal</maml:para>
+					</maml:description>
+					<command:parameterValue required="true" variableLength="false">SecureString</command:parameterValue>
+					<dev:defaultValue />
+				</command:parameter>
+				<command:parameter required="false" globbing="false" pipelineInput="false" variableLength="false" position="named">
+					<maml:name>OAuthURI</maml:name>
+					<maml:description>
+						<maml:para>The URI for requesting oAuth token. if not specified, the default value is "https://login.microsoftonline.com/$TenantId/oauth2/token"</maml:para>
+					</maml:description>
+					<command:parameterValue required="false" variableLength="false">String</command:parameterValue>
+					<dev:defaultValue>https://login.microsoftonline.com/$TenantId/oauth2/token</dev:defaultValue>
+				</command:parameter>
+				<command:parameter required="false" globbing="false" pipelineInput="false" variableLength="false" position="named">
+					<maml:name>ResourceURI</maml:name>
+					<maml:description>
+						<maml:para>The Resource URI for where the oAuth token will be consumed.</maml:para>
+					</maml:description>
+					<command:parameterValue required="false" variableLength="false">String</command:parameterValue>
+					<dev:defaultValue>https://management.azure.com/</dev:defaultValue>
+				</command:parameter>
+			</command:syntaxItem>
+			<command:syntaxItem parametersetname="ByCertThumbprint">
+				<!--NAME: ByCertThumbprint-->
+				<maml:name>Get-AzureADToken</maml:name>
+				<command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="named" aliases="tID" xmlns:command="http://schemas.microsoft.com/maml/dev/command/2004/10">
+					<maml:name xmlns:maml="http://schemas.microsoft.com/maml/2004/10">TenantId</maml:name>
+					<maml:description xmlns:maml="http://schemas.microsoft.com/maml/2004/10">
+						<maml:para>Azure AD Tenant ID</maml:para>
+					</maml:description>
+					<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+					<dev:type xmlns:dev="http://schemas.microsoft.com/maml/dev/2004/10">
+						<maml:name xmlns:maml="http://schemas.microsoft.com/maml/2004/10">String</maml:name>
+						<maml:uri xmlns:maml="http://schemas.microsoft.com/maml/2004/10" />
+					</dev:type>
+					<dev:defaultValue xmlns:dev="http://schemas.microsoft.com/maml/dev/2004/10"></dev:defaultValue>
+				</command:parameter>
+				<command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="named" aliases="" xmlns:command="http://schemas.microsoft.com/maml/dev/command/2004/10">
+					<maml:name xmlns:maml="http://schemas.microsoft.com/maml/2004/10">ApplicationId</maml:name>
+					<maml:description xmlns:maml="http://schemas.microsoft.com/maml/2004/10">
+						<maml:para>Azure AD Application ID</maml:para>
+					</maml:description>
+					<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+					<dev:type xmlns:dev="http://schemas.microsoft.com/maml/dev/2004/10">
+						<maml:name xmlns:maml="http://schemas.microsoft.com/maml/2004/10">String</maml:name>
+						<maml:uri xmlns:maml="http://schemas.microsoft.com/maml/2004/10" />
+					</dev:type>
+					<dev:defaultValue xmlns:dev="http://schemas.microsoft.com/maml/dev/2004/10"></dev:defaultValue>
+				</command:parameter>
+				<command:parameter required="true" globbing="false" pipelineInput="false" variableLength="false" position="named">
+					<maml:name>CertThumbprint</maml:name>
+					<maml:description>
+						<maml:para>Thumbprint of the certificate that is used by Azure AD application certificate-based Service Principal. Before using the thumbprint, the certificate MUST be installed on the local computer's 'Personal' certificate store (Cert:\LocalMachine\My)</maml:para>
+					</maml:description>
+					<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+					<dev:defaultValue />
+				</command:parameter>
+				<command:parameter required="false" globbing="false" pipelineInput="false" variableLength="false" position="named">
+					<maml:name>OAuthURI</maml:name>
+					<maml:description>
+						<maml:para>The URI for requesting oAuth token. if not specified, the default value is "https://login.microsoftonline.com/$TenantId/oauth2/token"</maml:para>
+					</maml:description>
+					<command:parameterValue required="false" variableLength="false">String</command:parameterValue>
+					<dev:defaultValue>https://login.microsoftonline.com/$TenantId/oauth2/token</dev:defaultValue>
+				</command:parameter>
+				<command:parameter required="false" globbing="false" pipelineInput="false" variableLength="false" position="named">
+					<maml:name>ResourceURI</maml:name>
+					<maml:description>
+						<maml:para>The Resource URI for where the oAuth token will be consumed.</maml:para>
+					</maml:description>
+					<command:parameterValue required="false" variableLength="false">String</command:parameterValue>
+					<dev:defaultValue>https://management.azure.com/</dev:defaultValue>
 				</command:parameter>
 			</command:syntaxItem>
 		</command:syntax>
@@ -511,7 +623,7 @@ Add-AzureRMServicePrincipalAccount -ApplicationId $ApplicationId -TenantId $Tena
 				<maml:description>
 					<maml:para>The Resource URI for where the oAuth token will be consumed.</maml:para>
 				</maml:description>
-				<command:parameterValue required="false" variableLength="false" />
+				<command:parameterValue required="false" variableLength="false">String</command:parameterValue>
 				<dev:defaultValue>https://management.azure.com/</dev:defaultValue>
 			</command:parameter>
 			<command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="named" aliases="Cred" xmlns:command="http://schemas.microsoft.com/maml/dev/command/2004/10">
@@ -532,6 +644,42 @@ Add-AzureRMServicePrincipalAccount -ApplicationId $ApplicationId -TenantId $Tena
 					<maml:para>the Azure AD user name that you wish to generate the token for. User will be prompted to enter the password and pass MFA (if MFA is enabled) when the user name is specified.</maml:para>
 				</maml:description>
 				<command:parameterValue required="false" variableLength="false">String</command:parameterValue>
+				<dev:defaultValue />
+			</command:parameter>
+			<command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="named" aliases="" xmlns:command="http://schemas.microsoft.com/maml/dev/command/2004/10">
+				<maml:name xmlns:maml="http://schemas.microsoft.com/maml/2004/10">ApplicationId</maml:name>
+				<maml:description xmlns:maml="http://schemas.microsoft.com/maml/2004/10">
+					<maml:para>Azure AD Application ID</maml:para>
+				</maml:description>
+				<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+				<dev:type xmlns:dev="http://schemas.microsoft.com/maml/dev/2004/10">
+					<maml:name xmlns:maml="http://schemas.microsoft.com/maml/2004/10">String</maml:name>
+					<maml:uri xmlns:maml="http://schemas.microsoft.com/maml/2004/10" />
+				</dev:type>
+				<dev:defaultValue xmlns:dev="http://schemas.microsoft.com/maml/dev/2004/10"></dev:defaultValue>
+			</command:parameter>
+			<command:parameter required="true" globbing="false" pipelineInput="false" variableLength="false" position="named">
+				<maml:name>CertFilePath</maml:name>
+				<maml:description>
+					<maml:para>Path to the PFX Certificate file that is used by Azure AD application certificate-based Service Principal.</maml:para>
+				</maml:description>
+				<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+				<dev:defaultValue />
+			</command:parameter>
+			<command:parameter required="true" globbing="false" pipelineInput="false" variableLength="false" position="named">
+				<maml:name>CertFilePassword</maml:name>
+				<maml:description>
+					<maml:para>Password of the PFX Certificate file that is used by Azure AD application certificate-based Service Principal</maml:para>
+				</maml:description>
+				<command:parameterValue required="true" variableLength="false">SecureString</command:parameterValue>
+				<dev:defaultValue />
+			</command:parameter>
+			<command:parameter required="true" globbing="false" pipelineInput="false" variableLength="false" position="named">
+				<maml:name>CertThumbprint</maml:name>
+				<maml:description>
+					<maml:para>Thumbprint of the certificate that is used by Azure AD application certificate-based Service Principal. Before using the thumbprint, the certificate MUST be installed on the local computer's 'Personal' certificate store (Cert:\LocalMachine\My)</maml:para>
+				</maml:description>
+				<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
 				<dev:defaultValue />
 			</command:parameter>
 		</command:parameters>
@@ -650,6 +798,41 @@ $Token</dev:code>
 $Token</dev:code>
 				<dev:remarks>
 					<maml:para>Generate an oAuth token to access ARM rest API (https://management.azure.com) for an Azure AD user account (by prompting entering the password). This method supports user accounts with MFA enabled. The user name is restricted to the value that's been passed in. If the user changes user name in the logon prompt windows, the function will fail.</maml:para>
+				</dev:remarks>
+			</command:example>
+			<command:example xmlns:command="http://schemas.microsoft.com/maml/dev/command/2004/10">
+				<maml:title xmlns:maml="http://schemas.microsoft.com/maml/2004/10">--------EXAMPLE 8--------</maml:title>
+				<maml:introduction xmlns:maml="http://schemas.microsoft.com/maml/2004/10">
+					<maml:para>C:\PS&gt;</maml:para>
+				</maml:introduction>
+				<dev:code xmlns:dev="http://schemas.microsoft.com/maml/dev/2004/10">$CertBasedConnection = Get-AutomationConnection 'CertBasedConnectionName'
+$Token = Get-AzureADToken -AzureServicePrincipalConnection $CertBasedConnection
+$Token</dev:code>
+				<dev:remarks xmlns:dev="http://schemas.microsoft.com/maml/dev/2004/10">
+					<maml:para>Generate an oAuth token to access ARM rest API (https://management.azure.com) using a cert-based service principal connection object (This connection type is built-in to Azure Automation account).</maml:para>
+				</dev:remarks>
+			</command:example>
+			<command:example xmlns:command="http://schemas.microsoft.com/maml/dev/command/2004/10">
+				<maml:title xmlns:maml="http://schemas.microsoft.com/maml/2004/10">--------EXAMPLE 9--------</maml:title>
+				<maml:introduction xmlns:maml="http://schemas.microsoft.com/maml/2004/10">
+					<maml:para>C:\PS&gt;</maml:para>
+				</maml:introduction>
+				<dev:code xmlns:dev="http://schemas.microsoft.com/maml/dev/2004/10">$CertPassword = ConvertTo-SecureString -string 'CertPassword' -AsPlainText -Force
+$Token = Get-AzureADToken TenantID $TenantId -ApplicationId $ApplicationId -CertFilePath "C:\Temp\AzureCert.pfx" -CertFilePassword $CertPlainPassword
+$Token</dev:code>
+				<dev:remarks xmlns:dev="http://schemas.microsoft.com/maml/dev/2004/10">
+					<maml:para>Generate an oAuth token to access ARM rest API (https://management.azure.com) using a PFX certificate file located on local drive.</maml:para>
+				</dev:remarks>
+			</command:example>
+			<command:example xmlns:command="http://schemas.microsoft.com/maml/dev/command/2004/10">
+				<maml:title xmlns:maml="http://schemas.microsoft.com/maml/2004/10">--------EXAMPLE 10--------</maml:title>
+				<maml:introduction xmlns:maml="http://schemas.microsoft.com/maml/2004/10">
+					<maml:para>C:\PS&gt;</maml:para>
+				</maml:introduction>
+				<dev:code xmlns:dev="http://schemas.microsoft.com/maml/dev/2004/10">$Token = Get-AzureADToken TenantID $TenantId -ApplicationId $ApplicationId -CertThumbprint 'A79EA30CED661F2D580DBA1A7709A4309E5AC26'
+$Token</dev:code>
+				<dev:remarks xmlns:dev="http://schemas.microsoft.com/maml/dev/2004/10">
+					<maml:para>Generate an oAuth token to access ARM rest API (https://management.azure.com) by specifying the certificate thumbprint of a cert used by the Service Principal of a n Azure AD Application. The certificate must be installed on the local computer under Local Computer Personal certificate store (Cert:\LocalMachine\My).</maml:para>
 				</dev:remarks>
 			</command:example>
 		</command:examples>

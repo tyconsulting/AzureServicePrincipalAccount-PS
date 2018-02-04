@@ -11,12 +11,12 @@ Function Add-AzureRMServicePrincipalAccount
     [Parameter(ParameterSetName = 'BySPCert',Mandatory = $true,HelpMessage = 'Please specify the Azure AD Application ID')]
     [Alias('AppId')]
     [ValidateScript({
-    try {
-      [System.Guid]::Parse($_) | Out-Null
-        $true
-      } catch {
-        $false
-      }
+          try {
+            [System.Guid]::Parse($_) | Out-Null
+            $true
+          } catch {
+            $false
+          }
     })]
     [string]$ApplicationId,
 
@@ -24,12 +24,12 @@ Function Add-AzureRMServicePrincipalAccount
     [Parameter(ParameterSetName = 'BySPCert',Mandatory = $false,HelpMessage = 'Please specify the Azure AD tenant ID')]
     [Alias('Tenant')]
     [ValidateScript({
-    try {
-      [System.Guid]::Parse($_) | Out-Null
-        $true
-      } catch {
-        $false
-      }
+          try {
+            [System.Guid]::Parse($_) | Out-Null
+            $true
+          } catch {
+            $false
+          }
     })]
     [string]$TenantId,
 
@@ -37,12 +37,12 @@ Function Add-AzureRMServicePrincipalAccount
     [Parameter(ParameterSetName = 'BySPCert',Mandatory = $false,HelpMessage = 'Please specify the Azure subscription ID')]
     [Alias('Subscription')]
     [ValidateScript({
-    try {
-      [System.Guid]::Parse($_) | Out-Null
-        $true
-      } catch {
-        $false
-      }
+          try {
+            [System.Guid]::Parse($_) | Out-Null
+            $true
+          } catch {
+            $false
+          }
     })]
     [string]$SubscriptionId,
 
@@ -141,20 +141,37 @@ Function Get-AzureADToken
 
     [Parameter(ParameterSetName='ByCred', Mandatory=$true)]
     [Parameter(ParameterSetName='UserInteractive', Mandatory = $true)]
+    [Parameter(ParameterSetName='ByCertFile', Mandatory=$true)]
+    [Parameter(ParameterSetName='ByCertThumbprint', Mandatory=$true)]
     [ValidateScript({
-      try 
-      {
-        [System.Guid]::Parse($_) | Out-Null
-        $true
-      } 
-      catch 
-      {
-        $false
-      }
+          try 
+          {
+            [System.Guid]::Parse($_) | Out-Null
+            $true
+          } 
+          catch 
+          {
+            $false
+          }
     })]
     [Alias('tID')]
     [String]$TenantID,
 
+    [Parameter(ParameterSetName='ByCertFile', Mandatory=$true)]
+    [Parameter(ParameterSetName='ByCertThumbprint', Mandatory=$true)]
+    [ValidateScript({
+          try 
+          {
+            [System.Guid]::Parse($_) | Out-Null
+            $true
+          } 
+          catch 
+          {
+            $false
+          }
+    })]
+    [String]$ApplicationId,
+    
     [Parameter(ParameterSetName = 'ByCred',Mandatory = $true,HelpMessage = 'Please specify the Azure AD credential')]
     [Alias('cred')]
     [ValidateNotNullOrEmpty()]
@@ -163,15 +180,31 @@ Function Get-AzureADToken
     [Parameter(ParameterSetName = 'UserInteractive',Mandatory = $false)]
     [ValidateNotNullOrEmpty()]
     [string]$UserName,
-
+    
+    [Parameter(ParameterSetName = 'ByCertFile',Mandatory = $true,HelpMessage = 'Please specify the pfx Certificate file path')]
+    [ValidateScript({test-path $_})]
+    [string]$CertFilePath,
+    
+    [Parameter(ParameterSetName = 'ByCertFile',Mandatory = $true,HelpMessage = 'Please specify the pfx Certificate file password')]
+    [ValidateNotNullOrEmpty()]
+    [SecureString]$CertFilePassword,
+    
+    [Parameter(ParameterSetName = 'ByCertThumbprint',Mandatory = $true,HelpMessage = "Please specify the Thumbprint of the certificate located in 'Cert:\LocalMachine\My' cert store")]
+    [ValidateScript({test-path "Cert:\LocalMachine\My\$_"})]
+    [string]$CertThumbprint,
+    
     [Parameter(ParameterSetName='BySPConnection', Mandatory = $false)]
     [Parameter(ParameterSetName='ByCred', Mandatory = $false)]
     [Parameter(ParameterSetName='UserInteractive', Mandatory = $false)]
+    [Parameter(ParameterSetName='ByCertFile', Mandatory=$false)]
+    [Parameter(ParameterSetName='ByCertThumbprint', Mandatory=$false)]
     [String][ValidateNotNullOrEmpty()]$OAuthURI,
 
     [Parameter(ParameterSetName='BySPConnection', Mandatory = $false)]
     [Parameter(ParameterSetName='ByCred', Mandatory = $false)]
     [Parameter(ParameterSetName='UserInteractive', Mandatory = $false)]
+    [Parameter(ParameterSetName='ByCertFile', Mandatory=$false)]
+    [Parameter(ParameterSetName='ByCertThumbprint', Mandatory=$false)]
     [String][ValidateNotNullOrEmpty()]$ResourceURI ='https://management.azure.com/'
     )
   
@@ -195,9 +228,11 @@ Function Get-AzureADToken
         {
 
           $token = Get-AzureADTokenForServicePrincipal -AzureServicePrincipalConnection $AzureServicePrincipalConnection -OAuthURI $OAuthURI -ResourceURI $ResourceURI
+        } elseif ($AzureServicePrincipalConnection.ContainsKey('CertificateThumbprint')) {
+          $token = Get-AzureADTokenForCertServicePrincipal -AzureServicePrincipalConnection $AzureServicePrincipalConnection -OAuthURI $OAuthURI -ResourceURI $ResourceURI
         }
       } else {
-        Write-Error "The connection object is invalid. please ensure the connection object type must be 'Key Based AzureServicePrincipal'."
+        Write-Error "The connection object is invalid. please ensure the connection object type must be either 'Key Based AzureServicePrincipal' or 'AzureServicePrincipal'."
         Exit -1
       }
 
@@ -221,12 +256,16 @@ Function Get-AzureADToken
       } else {
         $Token = Get-AzureADTokenForUser -TenantID $TenantID -Credential $Credential -OAuthURI $OAuthURI -ResourceURI $ResourceURI
       }
-    } else {
+    } elseif ($PSCmdlet.ParameterSetName -eq 'ByCertFile') {
+      $Token = Get-AzureADTokenForCertServicePrincipal -TenantID $TenantID -ApplicationId $ApplicationId -CertFilePath $CertFilePath -CertFilePassword $CertFilePassword -OAuthURI $OAuthURI -ResourceURI $ResourceURI
+    } elseif ($PSCmdlet.ParameterSetName -eq 'ByCertThumbprint') {
+      $Token = Get-AzureADTokenForCertServicePrincipal -TenantID $TenantID -ApplicationId $ApplicationId -CertThumbprint $CertThumbprint -OAuthURI $OAuthURI -ResourceURI $ResourceURI
+    }else {
       #Getting an token for user principal by interactive logon - support for MFA scenario
       $InteractiveParam = @{
-       'TenantID' = $TenantID
-       'OAuthURI' = $OAuthURI
-       'ResourceURI' = $ResourceURI
+        'TenantID' = $TenantID
+        'OAuthURI' = $OAuthURI
+        'ResourceURI' = $ResourceURI
       }
       if ($PSBoundParameters.ContainsKey('UserName'))
       {
@@ -249,15 +288,15 @@ Function Get-AzureADTokenForServicePrincipal
 
     [Parameter(ParameterSetName='ByCred', Mandatory=$true)]
     [ValidateScript({
-      try 
-      {
-        [System.Guid]::Parse($_) | Out-Null
-        $true
-      } 
-      catch 
-      {
-        $false
-      }
+          try 
+          {
+            [System.Guid]::Parse($_) | Out-Null
+            $true
+          } 
+          catch 
+          {
+            $false
+          }
     })]
     [Alias('tID')]
     [String]$TenantID,
@@ -383,7 +422,7 @@ Function Get-AzureADTokenForUser
 
 Function Get-AzureADTokenForUserInteractive
 {
-[CmdletBinding()]
+  [CmdletBinding()]
   [OutputType([string])]
   PARAM (
     [Parameter(Mandatory=$true)]
@@ -440,4 +479,129 @@ Function Get-AzureADTokenForUserInteractive
   }
   
   $token
+}
+
+Function Get-AzureADTokenForCertServicePrincipal
+{
+  [CmdletBinding()]
+  [OutputType([string])]
+  PARAM (
+    [Parameter(ParameterSetName='BySPConnection', Mandatory=$true)]
+    [Alias('Con','Connection')]
+    [Object]$AzureServicePrincipalConnection,
+
+    [Parameter(ParameterSetName='ByCertFile', Mandatory=$true)]
+    [Parameter(ParameterSetName='ByCertThumbprint', Mandatory=$true)]
+    [ValidateScript({
+          try 
+          {
+            [System.Guid]::Parse($_) | Out-Null
+            $true
+          } 
+          catch 
+          {
+            $false
+          }
+    })]
+    [String]$TenantID,
+
+    [Parameter(ParameterSetName='ByCertFile', Mandatory=$true)]
+    [Parameter(ParameterSetName='ByCertThumbprint', Mandatory=$true)]
+    [ValidateScript({
+          try 
+          {
+            [System.Guid]::Parse($_) | Out-Null
+            $true
+          } 
+          catch 
+          {
+            $false
+          }
+    })]
+    [String]$ApplicationId,
+    
+    [Parameter(ParameterSetName = 'ByCertFile',Mandatory = $true,HelpMessage = 'Please specify the pfx Certificate file path')]
+    [ValidateScript({test-path $_})]
+    [string]$CertFilePath,
+    
+    [Parameter(ParameterSetName = 'ByCertFile',Mandatory = $true,HelpMessage = 'Please specify the pfx Certificate file path')]
+    [ValidateNotNullOrEmpty()]
+    [SecureString]$CertFilePassword,
+    
+    [Parameter(ParameterSetName = 'ByCertThumbprint',Mandatory = $true,HelpMessage = "Please specify the Thumbprint of the certificate located in 'Cert:\LocalMachine\My' cert store")]
+    [ValidateScript({test-path "Cert:\LocalMachine\My\$_"})]
+    [string]$CertThumbprint,
+    
+    [Parameter(ParameterSetName='BySPConnection', Mandatory = $false)]
+    [Parameter(ParameterSetName='ByCertFile', Mandatory = $false)]
+    [Parameter(ParameterSetName='ByCertThumbprint', Mandatory = $false)]
+    [String][ValidateNotNullOrEmpty()]$OAuthURI,
+
+    [Parameter(ParameterSetName='BySPConnection', Mandatory = $false)]
+    [Parameter(ParameterSetName='ByCertFile', Mandatory = $false)]
+    [Parameter(ParameterSetName='ByCertThumbprint', Mandatory = $false)]
+    [String][ValidateNotNullOrEmpty()]$ResourceURI ='https://management.azure.com/'
+    )
+  
+  #Extract fields from connection (hashtable)
+    If ($PSCmdlet.ParameterSetName -eq 'BySPConnection')
+    {
+      $bvalidConnectionObject = $false
+      if ($AzureServicePrincipalConnection.ContainsKey('Applicationid') -and $AzureServicePrincipalConnection.ContainsKey('TenantId') -and$AzureServicePrincipalConnection.ContainsKey('SubscriptionId'))
+      {
+        if ($AzureServicePrincipalConnection.ContainsKey('CertificateThumbprint'))
+        {
+
+          $ApplicationId = $AzureServicePrincipalConnection.ApplicationId
+          $CertThumbprint = $AzureServicePrincipalConnection.CertificateThumbprint
+        
+          $TenantId = $AzureServicePrincipalConnection.TenantId
+          $bvalidConnectionObject = $true
+        }
+      }
+
+      if (!$bvalidConnectionObject)
+      {
+        Write-Error "The connection object is invalid. please ensure the connection object type must be 'AzureServicePrincipal'."
+        Exit -1
+      }
+    }
+
+  #Get the cert X509Certificate object
+  If ($PSCmdlet.ParameterSetName -eq 'ByCertFile')
+  {
+    try {
+      $marshal = [System.Runtime.InteropServices.Marshal]
+      $ptr = $marshal::SecureStringToBSTR($CertFilePassword)
+      $CertFilePlainPassword = $marshal::PtrToStringBSTR($ptr)
+      $marshal::ZeroFreeBSTR($ptr)
+      $Cert = [System.Security.Cryptography.X509Certificates.X509Certificate2]::New($CertFilePath, $CertFilePlainPassword)
+    } Catch {
+      Throw $_.Exception
+      Exit -1
+    }
+  } else {
+    $CertStore = "Cert:\LocalMachine\My"
+    $CertStorePath = Join-Path $CertStore $CertThumbprint
+    $Cert = Get-Item $CertStorePath
+    if (!$Cert)
+    {
+      Write-Error "Unable to get cert with thumbprint $CertThumbprint in cert store '$CertStore'."
+      exit -1
+    }
+  }
+  
+
+  #URI to get oAuth Access Token
+  If (!$PSBoundParameters.ContainsKey('oAuthURI'))
+  {
+    $oAuthURI = "https://login.microsoftonline.com/$TenantId/oauth2/token"
+  }
+  
+  #oAuth token request
+  $ClientCert = [Microsoft.IdentityModel.Clients.ActiveDirectory.ClientAssertionCertificate]::new($ApplicationId, $Cert)
+  $authContext = [Microsoft.IdentityModel.Clients.ActiveDirectory.AuthenticationContext]::new($oAuthURI)
+  $Token = ($authContext.AcquireTokenAsync($ResourceUri, $ClientCert)).Result.AccessToken
+  $Token = "Bearer $Token"
+  $Token
 }
