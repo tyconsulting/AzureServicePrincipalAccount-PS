@@ -11,7 +11,7 @@
 		<!--TAG: HASCOMMONPARAMETERS-->
 		<!--Command-->
 		<command:details>
-			<command:name>Add-AzureRMServicePrincipalAccount</command:name>
+			<command:name>Add-AzRMServicePrincipalAccount</command:name>
 			<maml:description>
 				<maml:para></maml:para>
 			</maml:description>
@@ -29,7 +29,7 @@
 			<!--Parameter Sets-->
 			<command:syntaxItem parametersetname="BySPConnection">
 				<!--NAME: BySPConnection-->
-				<maml:name>Add-AzureRMServicePrincipalAccount</maml:name>
+				<maml:name>Add-AzRMServicePrincipalAccount</maml:name>
 				<command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="named">
 					<maml:name>AzureServicePrincipalConnection</maml:name>
 					<maml:description>
@@ -45,7 +45,7 @@
 			</command:syntaxItem>
 			<command:syntaxItem parametersetname="BySPCert">
 				<!--NAME: BySPCert-->
-				<maml:name>Add-AzureRMServicePrincipalAccount</maml:name>
+				<maml:name>Add-AzRMServicePrincipalAccount</maml:name>
 				<command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="named" aliases="AppId">
 					<maml:name>ApplicationId</maml:name>
 					<maml:description>
@@ -109,7 +109,7 @@
 			</command:syntaxItem>
 			<command:syntaxItem parametersetname="BySPKey">
 				<!--NAME: BySPKey-->
-				<maml:name>Add-AzureRMServicePrincipalAccount</maml:name>
+				<maml:name>Add-AzRMServicePrincipalAccount</maml:name>
 				<command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="named" aliases="AppId">
 					<maml:name>ApplicationId</maml:name>
 					<maml:description>
@@ -292,7 +292,7 @@
 					<maml:para>C:\PS&gt;</maml:para>
 				</maml:introduction>
 				<dev:code>$KeyBasedConnection = Get-AutomationConnection 'KeyBasedConnectionName'
-Add-AzureRMServicePrincipalAccount -AzureServicePrincipalConnection $KeyBasedConnection</dev:code>
+Add-AzRMServicePrincipalAccount -AzureServicePrincipalConnection $KeyBasedConnection</dev:code>
 				<dev:remarks>
 					<maml:para>Sign in to Azure using a key-based service principal connection object</maml:para>
 				</dev:remarks>
@@ -303,7 +303,7 @@ Add-AzureRMServicePrincipalAccount -AzureServicePrincipalConnection $KeyBasedCon
 					<maml:para>C:\PS&gt;</maml:para>
 				</maml:introduction>
 				<dev:code xmlns:dev="http://schemas.microsoft.com/maml/dev/2004/10">$CertBasedConnection = Get-AutomationConnection 'CertBasedConnectionName'
-Add-AzureRMServicePrincipalAccount -AzureServicePrincipalConnection $CertBasedConnection</dev:code>
+Add-AzRMServicePrincipalAccount -AzureServicePrincipalConnection $CertBasedConnection</dev:code>
 				<dev:remarks xmlns:dev="http://schemas.microsoft.com/maml/dev/2004/10">
 					<maml:para>Sign in to Azure using a Certificate-based service principal connection object</maml:para>
 				</dev:remarks>
@@ -314,7 +314,7 @@ Add-AzureRMServicePrincipalAccount -AzureServicePrincipalConnection $CertBasedCo
 					<maml:para>C:\PS&gt;</maml:para>
 				</maml:introduction>
 				<dev:code>$ServicePrincipalKey = ConvertTo-SecureString -String 'password1234'-AsPlainText -Force
-Add-AzureRMServicePrincipalAccount -ApplicationId $ApplicationId -TenantId $TenantId -SubscriptionId $SubscriptionId -ServicePrincipalKey $ServicePrincipalKey
+Add-AzRMServicePrincipalAccount -ApplicationId $ApplicationId -TenantId $TenantId -SubscriptionId $SubscriptionId -ServicePrincipalKey $ServicePrincipalKey
 </dev:code>
 				<dev:remarks>
 					<maml:para>Sign in to Azure using a key-based service principal by specifying individual parameters</maml:para>
@@ -326,7 +326,7 @@ Add-AzureRMServicePrincipalAccount -ApplicationId $ApplicationId -TenantId $Tena
 					<maml:para>C:\PS&gt;</maml:para>
 				</maml:introduction>
 				<dev:code xmlns:dev="http://schemas.microsoft.com/maml/dev/2004/10">$CertThumbprint = '073691B279C78A6C411F70DEE763DE322B547F67'
-Add-AzureRMServicePrincipalAccount -ApplicationId $ApplicationId -TenantId $TenantId -SubscriptionId $SubscriptionId -CertThumbprint $CertThumbprint
+Add-AzRMServicePrincipalAccount -ApplicationId $ApplicationId -TenantId $TenantId -SubscriptionId $SubscriptionId -CertThumbprint $CertThumbprint
 </dev:code>
 				<dev:remarks xmlns:dev="http://schemas.microsoft.com/maml/dev/2004/10">
 					<maml:para>Sign in to Azure using a certificate-based service principal by specifying individual parameters</maml:para>

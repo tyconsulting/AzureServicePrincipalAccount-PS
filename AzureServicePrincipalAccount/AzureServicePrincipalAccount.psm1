@@ -1,5 +1,5 @@
 # .EXTERNALHELP AzureServicePrincipalAccount.psm1-Help.xml
-Function Add-AzureRMServicePrincipalAccount
+Function Add-AzServicePrincipalAccount
 {
   [OutputType('PSAzureProfile')]
   [CmdletBinding()]
@@ -119,10 +119,10 @@ Function Add-AzureRMServicePrincipalAccount
   {
     Write-Verbose "Login using an Azure AD service principal with key (password)"
     $Cred = New-Object System.Management.Automation.PSCredential($ApplicationId, $ServicePrincipalKey)
-    $Login = Add-AzureRmAccount -ServicePrincipal -Credential $Cred -SubscriptionId $SubscriptionId -TenantId $TenantId -Environment $Environment
+    $Login = Connect-AzAccount -ServicePrincipal -Credential $Cred -SubscriptionId $SubscriptionId -TenantId $TenantId -Environment $Environment
   } else {
     Write-Verbose "Login using an Azure AD service principal with certificate"
-    $Login = Add-AzureRmAccount -ServicePrincipal -CertificateThumbprint $CertThumbprint -ApplicationId $ApplicationId -TenantId $TenantId -SubscriptionId $SubscriptionId -Environment $Environment
+    $Login = Connect-AzAccount -ServicePrincipal -CertificateThumbprint $CertThumbprint -ApplicationId $ApplicationId -TenantId $TenantId -SubscriptionId $SubscriptionId -Environment $Environment
   }
 
   $Login
@@ -605,3 +605,4 @@ Function Get-AzureADTokenForCertServicePrincipal
   $Token = "Bearer $Token"
   $Token
 }
+New-Alias -Name Add-AzureRMServicePrincipalAccount -Value Add-AzServicePrincipalAccount
