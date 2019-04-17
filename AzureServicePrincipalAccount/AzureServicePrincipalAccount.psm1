@@ -461,15 +461,16 @@ Function Get-AzureADTokenForUserInteractive
     Write-Verbose "Authority: $OAuthURI"
 
     $authContext = [Microsoft.IdentityModel.Clients.ActiveDirectory.AuthenticationContext]::new($oAuthURI)
+    $promptBehavior = [ Microsoft.IdentityModel.Clients.ActiveDirectory.PromptBehavior]::Always
     if ($PSBoundParameters.ContainsKey('UserName'))
     {
       $userIdentifier =  [Microsoft.IdentityModel.Clients.ActiveDirectory.UserIdentifier]::new($UserName, [Microsoft.IdentityModel.Clients.ActiveDirectory.UserIdentifierType]::RequiredDisplayableId)
-      $authResult = $authContext.AcquireToken($ResourceURI, $clientId, $redirectUri, "always", $userIdentifier)
+      $authResult = $authContext.AcquireTokenAsync($ResourceURI, $clientId, $redirectUri, [Microsoft.IdentityModel.Clients.ActiveDirectory.platformParameters]::new($promptBehavior), $userIdentifier)
     } else {
-      $authResult = $authContext.AcquireToken($ResourceURI, $clientId, $redirectUri, "always")
+      $authResult = $authContext.AcquireTokenAsync($ResourceURI, $clientId, $redirectUri, [Microsoft.IdentityModel.Clients.ActiveDirectory.platformParameters]::new($promptBehavior))
     }
     
-    $token = $authResult.CreateAuthorizationHeader()
+    $token = $authResult.Result.CreateAuthorizationHeader()
   }
   Catch
   {
