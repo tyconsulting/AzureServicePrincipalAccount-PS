@@ -1,5 +1,5 @@
 # .EXTERNALHELP AzureServicePrincipalAccount.psm1-Help.xml
-Function Add-AzureRMServicePrincipalAccount
+Function Add-AzServicePrincipalAccount
 {
   [OutputType('PSAzureProfile')]
   [CmdletBinding()]
@@ -119,10 +119,10 @@ Function Add-AzureRMServicePrincipalAccount
   {
     Write-Verbose "Login using an Azure AD service principal with key (password)"
     $Cred = New-Object System.Management.Automation.PSCredential($ApplicationId, $ServicePrincipalKey)
-    $Login = Add-AzureRmAccount -ServicePrincipal -Credential $Cred -SubscriptionId $SubscriptionId -TenantId $TenantId -Environment $Environment
+    $Login = Connect-AzAccount -ServicePrincipal -Credential $Cred -SubscriptionId $SubscriptionId -TenantId $TenantId -Environment $Environment
   } else {
     Write-Verbose "Login using an Azure AD service principal with certificate"
-    $Login = Add-AzureRmAccount -ServicePrincipal -CertificateThumbprint $CertThumbprint -ApplicationId $ApplicationId -TenantId $TenantId -SubscriptionId $SubscriptionId -Environment $Environment
+    $Login = Connect-AzAccount -ServicePrincipal -CertificateThumbprint $CertThumbprint -ApplicationId $ApplicationId -TenantId $TenantId -SubscriptionId $SubscriptionId -Environment $Environment
   }
 
   $Login
@@ -461,15 +461,16 @@ Function Get-AzureADTokenForUserInteractive
     Write-Verbose "Authority: $OAuthURI"
 
     $authContext = [Microsoft.IdentityModel.Clients.ActiveDirectory.AuthenticationContext]::new($oAuthURI)
+    $promptBehavior = [ Microsoft.IdentityModel.Clients.ActiveDirectory.PromptBehavior]::Always
     if ($PSBoundParameters.ContainsKey('UserName'))
     {
       $userIdentifier =  [Microsoft.IdentityModel.Clients.ActiveDirectory.UserIdentifier]::new($UserName, [Microsoft.IdentityModel.Clients.ActiveDirectory.UserIdentifierType]::RequiredDisplayableId)
-      $authResult = $authContext.AcquireToken($ResourceURI, $clientId, $redirectUri, "always", $userIdentifier)
+      $authResult = $authContext.AcquireTokenAsync($ResourceURI, $clientId, $redirectUri, [Microsoft.IdentityModel.Clients.ActiveDirectory.platformParameters]::new($promptBehavior), $userIdentifier)
     } else {
-      $authResult = $authContext.AcquireToken($ResourceURI, $clientId, $redirectUri, "always")
+      $authResult = $authContext.AcquireTokenAsync($ResourceURI, $clientId, $redirectUri, [Microsoft.IdentityModel.Clients.ActiveDirectory.platformParameters]::new($promptBehavior))
     }
     
-    $token = $authResult.CreateAuthorizationHeader()
+    $token = $authResult.Result.CreateAuthorizationHeader()
   }
   Catch
   {
@@ -605,3 +606,4 @@ Function Get-AzureADTokenForCertServicePrincipal
   $Token = "Bearer $Token"
   $Token
 }
+New-Alias -Name Add-AzureRMServicePrincipalAccount -Value Add-AzServicePrincipalAccount
