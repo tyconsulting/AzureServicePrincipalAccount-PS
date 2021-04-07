@@ -10,11 +10,12 @@ Tao Yang | 20/11/2017 | 1.3.0 | Get-AzureADToken added support for interactive u
 Tao Yang | 21/11/2017 | 1.4.0 | Get-AzureADToken added support for passing in user name for interactive user logins (ideally for MFA-Enabled users)
 Tao Yang | 04/02/2018 | 1.5.0 | Get-AzureADToken added support for certificate-based Azure AD Service Principals
 Tao Yang | 18/04/2019 | 2.0.0 | Updated the module to use the new Az PowerShell module. **Do not use this version if you are still using AzureRM modules.**
+Tao Yang | 07/04/2021 | 2.1.0 | Added Microsoft.IdentityModel.Clients.ActiveDirectory.dll to the module since the Az PowerShell module no longer uses it.
 
 ## Introduction
 The **AzureServicePrincipalAccount** Powershell module is designed to simplify the Azure Sign-In process within the Azure Automation accounts using Azure AD Service Principals.
 
-### Add-AzureRMServicePrincipalAccount
+### Add-AzServicePrincipalAccount
 
 By the default, the Azure AD Service Principal connection type provided by Azure Automation accounts only supports certificate-based Azure AD Service Principals. This module provides an additional connection type for key-based Service Principals:
 
